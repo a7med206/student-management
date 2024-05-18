@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Guid } from "guid-typescript";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BehaviorSubject } from 'rxjs';
 import { StudentFormComponent } from '../student-form/student-form.component';
 
 
@@ -23,6 +24,7 @@ export class StudentTableComponent {
   students: Student[] = [];
   selectedStudents: Student[] = [];
   modalRef?: BsModalRef;
+  isAllSelected = new BehaviorSubject<boolean>(false);
 
   constructor(private modalService: BsModalService) { }
 
@@ -30,7 +32,6 @@ export class StudentTableComponent {
     const initialState = { student };
     this.modalRef = this.modalService.show(StudentFormComponent, { initialState });
     this.modalRef.content.onSave.subscribe((result: Student) => {
-      console.log('result', result);
       if (student) {
         // Edit existing student
         const index = this.students.findIndex(s => s.id === student.id);
@@ -46,23 +47,29 @@ export class StudentTableComponent {
   }
 
   deleteSelectedStudents() {
-    this.students = this.students.filter(student => !this.selectedStudents.includes(student));
+    const selectedStudentsIds = this.selectedStudents.map(s => s.id);
+    this.students = this.students.filter(student => !selectedStudentsIds.includes(student.id));
     this.selectedStudents = [];
+    this.isAllSelected.next(false);
   }
 
   onAllCheckBoxesChange(event: Event) {
+
     const checked = (event.target as HTMLInputElement).checked;
-    if (checked) this.selectedStudents = this.students;
-    else this.selectedStudents = [];
+    this.isAllSelected.next(checked);
+    if (checked) {
+      this.selectedStudents = this.students;
+      this.students = this.students.map(s => ({ ...s, selected: true }));
+    } else {
+      this.selectedStudents = [];
+      this.students = this.students.map(s => ({ ...s, selected: false }));
+    }
   }
 
 
-  onCheckBoxChange(event: Event) {
-    const checked = (event.target as HTMLInputElement).checked;
-    const studentId = (event.target as HTMLInputElement).value;
-    const student = this.students.find(s => s.id === studentId);
-    if (student && checked) this.selectedStudents.push(student);
-    else this.selectedStudents = this.selectedStudents.filter(s => s.id !== studentId);
+  onCheckBoxChange(checked: boolean, student: Student) {
+    if (checked) this.selectedStudents.push(student);
+    else this.selectedStudents = this.selectedStudents.filter(s => s.id !== student.id);
   }
 
 
