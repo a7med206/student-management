@@ -1,0 +1,150 @@
+<div class="modal-header">
+  <h4 class="modal-title pull-left">
+    {{ student ? "Edit Student" : "Create Student" }}
+  </h4>
+  <button
+    type="button"
+    class="close btn btn-outline-secondary circle"
+    aria-label="Close" title="Close"
+    (click)="bsModalRef.hide()"
+  >
+    <span aria-hidden="true" class="h3">x</span>
+  </button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="studentForm" (ngSubmit)="save()">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input
+        type="text"
+        id="name"
+        class="form-control"
+        formControlName="name"
+        [ngClass]="{
+          'is-invalid':
+            studentForm.get('name')?.touched && studentForm.get('name')?.invalid
+        }"
+      />
+      <div
+        *ngIf="
+          studentForm.get('name')?.touched && studentForm.get('name')?.invalid
+        "
+        class="invalid-feedback"
+      >
+        <div *ngIf="studentForm.get('name')?.errors?.['required']">
+          Name is required
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        id="email"
+        class="form-control"
+        formControlName="email"
+        [ngClass]="{
+          'is-invalid':
+            studentForm.get('email')?.touched &&
+            studentForm.get('email')?.invalid
+        }"
+      />
+      <div
+        *ngIf="
+          studentForm.get('email')?.touched && studentForm.get('email')?.invalid
+        "
+        class="invalid-feedback"
+      >
+        <div *ngIf="studentForm.get('email')?.errors?.['required']">
+          Email is required
+        </div>
+        <div *ngIf="studentForm.get('email')?.errors?.['email']">
+          Email is invalid
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="age">Age</label>
+      <input
+        type="number"
+        id="age"
+        class="form-control"
+        formControlName="age"
+        [ngClass]="{
+          'is-invalid':
+            studentForm.get('age')?.touched && studentForm.get('age')?.invalid
+        }"
+      />
+      <div
+        *ngIf="
+          studentForm.get('age')?.touched && studentForm.get('age')?.invalid
+        "
+        class="invalid-feedback"
+      >
+        <div *ngIf="studentForm.get('age')?.errors?.['required']">
+          Age is required
+        </div>
+        <!-- min -->
+        <div *ngIf="studentForm.get('age')?.errors?.['min']">
+          Age must be greater than or equal to 1
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="dob" class="d-block">Date of Birth</label>
+      <p-calendar
+        id="dob"
+        formControlName="dob"
+        dateFormat="mm/dd/yy"
+        [maxDate]="minDob"
+        [styleClass]="
+          (studentForm.get('dob')?.touched || studentForm.get('dob')?.dirty) &&
+          studentForm.get('dob')?.invalid
+            ? 'is-invalid'
+            : ''
+        "
+      ></p-calendar>
+      <div
+        *ngIf="
+          (studentForm.get('dob')?.touched || studentForm.get('dob')?.dirty) &&
+          studentForm.get('dob')?.invalid
+        "
+      >
+        <div
+          *ngIf="studentForm.get('dob')?.errors?.['required']"
+          class="text-danger small"
+        >
+          Date of Birth is required
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="gender">Gender</label>
+      <ng-select
+        id="gender"
+        [items]="genders"
+        bindLabel="gender"
+        formControlName="gender"
+      ></ng-select>
+
+      <div
+        *ngIf="
+          studentForm.get('gender')?.touched &&
+          studentForm.get('gender')?.invalid
+        "
+        class="invalid-feedback"
+      >
+        <div *ngIf="studentForm.get('gender')?.errors?.['required']">
+          Gender is required
+        </div>
+      </div>
+    </div>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="studentForm.invalid"
+    >
+      Save
+    </button>
+  </form>
+</div>
